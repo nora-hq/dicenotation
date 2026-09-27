@@ -57,10 +57,27 @@ for i := 0; i < 5; i++ {
 
 A bare count defaults to 1, so `d20` and `1d20` are the same expression.
 
+## Compound expressions
+
+`Parse`/`Roll` handle a single dice term plus an optional flat modifier.
+For a sum of several terms, like `2d6+1d4` or `4d6dl1+2d8-2`, use
+`ParseExpression`/`RollExpression` instead:
+
+```go
+res, err := dicenotation.RollExpression("2d6+1d4")
+if err != nil {
+    log.Fatal(err)
+}
+fmt.Println(res) // [3 5] + [2] = 10
+```
+
+`ParseExpression` returns an `Expression`, a list of signed `Term`s (each
+wrapping a `Notation`) plus a combined flat `Modifier`. `Expression.Roll`
+returns a `CompoundResult` with one `Result` per term and the grand total.
+
 ## What this doesn't do (yet)
 
-No exploding dice, no rerolls, no compound expressions like `2d6+1d4`. See
-the issue tracker for what's planned.
+No exploding dice, no rerolls. See the issue tracker for what's planned.
 
 ## License
 

@@ -17,22 +17,30 @@ type Result struct {
 
 // String renders the individual rolls and the total, e.g. "[5 2 6] -3 = 10".
 func (r Result) String() string {
-	parts := make([]string, len(r.Rolls))
-	for i, v := range r.Rolls {
-		parts[i] = fmt.Sprintf("%d", v)
-	}
-	s := fmt.Sprintf("[%s]", strings.Join(parts, " "))
-	if len(r.Dropped) > 0 {
-		dropped := make([]string, len(r.Dropped))
-		for i, v := range r.Dropped {
-			dropped[i] = fmt.Sprintf("%d", v)
-		}
-		s += fmt.Sprintf(" (dropped %s)", strings.Join(dropped, " "))
-	}
+	s := rollsString(r.Rolls, r.Dropped)
 	if r.Notation.Modifier != 0 {
 		s += fmt.Sprintf(" %+d", r.Notation.Modifier)
 	}
 	return fmt.Sprintf("%s = %d", s, r.Total)
+}
+
+// rollsString renders the dice values and any dropped dice, e.g.
+// "[5 2 6 1] (dropped 1)". It's shared by Result and CompoundResult so a
+// compound expression's per-term output matches a plain Result's.
+func rollsString(rolls, dropped []int) string {
+	parts := make([]string, len(rolls))
+	for i, v := range rolls {
+		parts[i] = fmt.Sprintf("%d", v)
+	}
+	s := fmt.Sprintf("[%s]", strings.Join(parts, " "))
+	if len(dropped) > 0 {
+		d := make([]string, len(dropped))
+		for i, v := range dropped {
+			d[i] = fmt.Sprintf("%d", v)
+		}
+		s += fmt.Sprintf(" (dropped %s)", strings.Join(d, " "))
+	}
+	return s
 }
 
 // Roll rolls the dice described by n using r as the source of randomness.
